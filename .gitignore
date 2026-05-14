@@ -1,3 +1,7 @@
+# App Specific
+######################
+sdk/*
+
 # Visual Studio client-specific #
 ######################
 .vs
