@@ -1,0 +1,18 @@
+{
+  "Name": "Ethereal Legends",
+  "AppId": 428980,
+  "Description": "Ethereal Legends - Soverance Studios",
+  "DefaultContentRoot": "C:\\Soverance\\Ethereal\\Builds\\Win64-Shipping",
+  "Depots": [
+    {
+      "Id": 428981,
+      "FileMappings": [
+        {
+          "LocalPath": "*",
+          "DepotPath": ".",
+          "Recursive": true
+        }
+      ]
+    }
+  ]
+}

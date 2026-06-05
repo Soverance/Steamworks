@@ -2,6 +2,15 @@
 ######################
 sdk/*
 
+# Generated VDFs, build cache, and steamcmd output #
+######################
+Output/
+Logs/
+
+# Project configs with embedded secrets or local overrides #
+######################
+Scripts/Projects/*.local.json
+
 # Visual Studio client-specific #
 ######################
 .vs
