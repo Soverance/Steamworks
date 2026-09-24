@@ -1,0 +1,28 @@
+{
+  "Name": "Endless Reach",
+  "AppId": 689540,
+  "Description": "Endless Reach - Soverance Studios",
+  "DefaultContentRoot": "C:\\Soverance\\Endless-Reach\\build",
+  "Depots": [
+    {
+      "Id": 689542,
+      "FileMappings": [
+        {
+          "LocalPath": "windows\\*",
+          "DepotPath": ".",
+          "Recursive": true
+        }
+      ]
+    },
+    {
+      "Id": 689543,
+      "FileMappings": [
+        {
+          "LocalPath": "linux\\*",
+          "DepotPath": ".",
+          "Recursive": true
+        }
+      ]
+    }
+  ]
+}
