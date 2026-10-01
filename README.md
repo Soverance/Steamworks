@@ -68,6 +68,8 @@ Create `Scripts/Projects/<Name>.json` modeled after `Ethereal.json`:
 }
 ```
 
+Optional: `"BuildScript": "C:\\path\\to\\Export.ps1"`. `Publish-Steam.ps1` runs it before anything else, so an upload is always a fresh build rather than whatever was last staged (`-SkipBuild` re-sends the staged build as it is). If the build writes a `BUILD.txt` into the content root, outside the depot mappings, its first line (Endless Reach writes the game's commit) goes into the default build description, which is how to pick the right build on the SteamPipe Builds page. Endless Reach uses `tools\Export-Builds.ps1` from its repo.
+
 For UE5 projects, `DefaultContentRoot` should point to the UAT `-archivedirectory` output (the directory that contains the `.exe`, `Engine/`, and `<Project>/` subdirs). UE5 with `-platform=Win64` writes the staged build flat into the archive directory; older UE4-era `WindowsNoEditor` builds nested everything under a `WindowsNoEditor/` subfolder.
 
 ## Credentials

@@ -8,6 +8,13 @@
     app_build / depot_build VDF files from templates, and invokes the
     vendored steamcmd.exe to upload (or preview-validate) the build.
 
+    A project config may name a BuildScript (an absolute path to a .ps1).
+    It runs before anything else, so the upload is always a fresh build of
+    the game's latest commit, never whatever was last staged. If it writes
+    a BUILD.txt into the content root, that file's first line (e.g. the
+    commit) goes into the default build description. Use -SkipBuild to
+    re-send the staged build as it is.
+
     IMPORTANT: this file is ASCII-only. PowerShell 5.1 reads .ps1 files as
     Windows-1252 without a BOM, so em-dashes, smart quotes, or other
     non-ASCII characters will corrupt the parse. Keep edits ASCII.
@@ -29,7 +36,12 @@
 
 .PARAMETER Description
     Build description shown in the Steamworks UI. Defaults to the project
-    config's Description field, with a timestamp appended.
+    config's Description field, plus the first line of the content root's
+    BUILD.txt when there is one, with a timestamp appended.
+
+.PARAMETER SkipBuild
+    Do not run the project config's BuildScript; upload the staged build
+    as it is (e.g. to retry an upload that failed at login).
 
 .PARAMETER ContentRoot
     Override the project config's DefaultContentRoot. Must be an absolute
@@ -63,7 +75,9 @@ param(
 
     [string]$ContentRoot = '',
 
-    [string]$User = ''
+    [string]$User = '',
+
+    [switch]$SkipBuild
 )
 
 $ErrorActionPreference = 'Stop'
@@ -107,13 +121,35 @@ Do this instead:
 "@
 }
 
+# Build before logging in, so a failed build stops here and the upload is never stale.
+$BuildScript = $Config.BuildScript
+$BuildStep = 'none (no BuildScript in the project config)'
+if ($BuildScript) {
+    if ($SkipBuild) {
+        $BuildStep = 'skipped (-SkipBuild): uploading the staged build as it is'
+    } else {
+        if (-not (Test-Path $BuildScript)) {
+            throw "BuildScript not found: $BuildScript"
+        }
+        Write-Host "Building: $BuildScript" -ForegroundColor Cyan
+        & $BuildScript
+        $BuildStep = "ran $BuildScript"
+    }
+}
+
 $ResolvedContentRoot = if ($ContentRoot) { $ContentRoot } else { $Config.DefaultContentRoot }
 if (-not (Test-Path $ResolvedContentRoot)) {
     throw "ContentRoot does not exist: $ResolvedContentRoot. Stage the build first."
 }
 
+# What the build script says it built (the game's commit, for Endless Reach).
+$BuildInfoFile = Join-Path $ResolvedContentRoot 'BUILD.txt'
+$BuildInfo = if (Test-Path $BuildInfoFile) { (Get-Content $BuildInfoFile -TotalCount 1).Trim() } else { '' }
+
 $ResolvedDescription = if ($Description) {
     $Description
+} elseif ($BuildInfo) {
+    "$($Config.Description) $BuildInfo ($(Get-Date -Format 'yyyy-MM-dd HH:mm'))"
 } else {
     "$($Config.Description) ($(Get-Date -Format 'yyyy-MM-dd HH:mm'))"
 }
@@ -190,6 +226,8 @@ Write-Host '== Steam build summary ==' -ForegroundColor Cyan
 Write-Host "  Project       : $($Config.Name)"
 Write-Host "  AppID         : $AppId"
 Write-Host "  Depots        : $(($Depots | ForEach-Object { $_.Id }) -join ', ')"
+Write-Host "  Build step    : $BuildStep"
+if ($BuildInfo) { Write-Host "  Build         : $BuildInfo" }
 Write-Host "  ContentRoot   : $ResolvedContentRoot"
 Write-Host "  BuildOutput   : $BuildOutput"
 Write-Host "  Description   : $ResolvedDescription"
@@ -211,6 +249,8 @@ Project     : $($Config.Name)
 AppID       : $AppId
 Preview     : $($Preview.IsPresent)
 SetLive     : $SetLive
+Build step  : $BuildStep
+Build       : $BuildInfo
 ContentRoot : $ResolvedContentRoot
 AppVDF      : $AppVdfPath
 Started     : $(Get-Date -Format 'o')

@@ -3,6 +3,7 @@
   "AppId": 689540,
   "Description": "Endless Reach - Soverance Studios",
   "DefaultContentRoot": "C:\\Soverance\\Endless-Reach\\build",
+  "BuildScript": "C:\\Soverance\\Endless-Reach\\tools\\Export-Builds.ps1",
   "Depots": [
     {
       "Id": 689542,
