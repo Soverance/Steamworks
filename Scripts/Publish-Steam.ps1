@@ -21,7 +21,11 @@
 
 .PARAMETER SetLive
     Optional Steam beta branch name. If set, the build goes live on that
-    branch immediately on success. Omit for default (no auto-go-live).
+    branch immediately on success. Omit for no auto-go-live.
+    'default' is refused: Steam does not let steamcmd set a build live on
+    the default branch (the upload succeeds, then the commit fails with a
+    bare 'Failure'). Upload to a beta branch or with no SetLive, then set
+    it live on default in the Steamworks partner site (see the error text).
 
 .PARAMETER Description
     Build description shown in the Steamworks UI. Defaults to the project
@@ -87,6 +91,21 @@ if (-not (Test-Path $SdkSteamCmd)) {
 $Config = Get-Content $ProjectFile -Raw | ConvertFrom-Json
 $AppId  = $Config.AppId
 $Depots = $Config.Depots
+
+# Steam refuses to set the default branch live from steamcmd: the depots upload, then the
+# commit fails with a bare 'Failure' (exit 6). Stop before logging in, with the manual steps.
+if ($SetLive -eq 'default') {
+    throw @"
+SetLive 'default' is not allowed: Steam does not let steamcmd set a build live on the
+default branch (the upload succeeds, then the commit fails with 'Failure').
+Do this instead:
+  1. Upload to a beta branch, or with no SetLive at all:
+       .\Publish-Steam.ps1 -Project $Project -SetLive playtest
+  2. In the Steamworks partner site: App Admin > AppID $AppId > SteamPipe > Builds.
+  3. Find the new build (its description ends with today's date and time).
+  4. 'Set build live on branch...' > default > Preview Change > Set Build Live Now.
+"@
+}
 
 $ResolvedContentRoot = if ($ContentRoot) { $ContentRoot } else { $Config.DefaultContentRoot }
 if (-not (Test-Path $ResolvedContentRoot)) {

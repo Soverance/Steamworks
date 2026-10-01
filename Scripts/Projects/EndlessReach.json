@@ -23,6 +23,16 @@
           "Recursive": true
         }
       ]
+    },
+    {
+      "Id": 689544,
+      "FileMappings": [
+        {
+          "LocalPath": "macos\\*",
+          "DepotPath": ".",
+          "Recursive": true
+        }
+      ]
     }
   ]
 }
