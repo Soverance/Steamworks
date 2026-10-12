@@ -1,6 +1,6 @@
 # Soverance Steamworks
 
-Tooling and vendored SDK for publishing Soverance Studios games to Steam.
+Tools for publishing Soverance Studios games to Steam.
 
 ## Layout
 
