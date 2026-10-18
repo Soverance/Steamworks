@@ -1,0 +1,29 @@
+{
+  "Name": "Ethereal Tactics",
+  "AppId": 5461830,
+  "Description": "Ethereal Tactics - Soverance Studios",
+  "DefaultContentRoot": "C:\\Soverance\\EtherealTactics\\build",
+  "BuildScript": "C:\\Soverance\\EtherealTactics\\tools\\Export-Builds.ps1",
+  "Depots": [
+    {
+      "Id": 5461832,
+      "FileMappings": [
+        {
+          "LocalPath": "windows\\*",
+          "DepotPath": ".",
+          "Recursive": true
+        }
+      ]
+    },
+    {
+      "Id": 5461833,
+      "FileMappings": [
+        {
+          "LocalPath": "linux\\*",
+          "DepotPath": ".",
+          "Recursive": true
+        }
+      ]
+    }
+  ]
+}
